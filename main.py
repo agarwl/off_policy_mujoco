@@ -47,8 +47,9 @@ if __name__ == "__main__":
 	print "Settings: " + file_name
 	print "---------------------------------------"
 
-	if not os.path.exists("./results"):
-		os.makedirs("./results")
+	results_dir = "./results_%s" % (args.agent_name)
+	if not os.path.exists(results_dir):
+	  os.makedirs(results_dir)
 
 	env = gym.make(args.env_name)
 
@@ -83,7 +84,7 @@ if __name__ == "__main__":
 		pol_vals = policy.train(replay_buffer, iterations=int(args.eval_freq))
 
 		evaluations.append(evaluate_policy(policy))
-		np.save("./results/" + file_name, evaluations)
+		np.save(results_dir + "/" + file_name, evaluations)
 
 		training_iters += args.eval_freq
 		print "Training iterations: " + str(training_iters)
