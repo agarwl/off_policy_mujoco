@@ -3,4 +3,4 @@ buffers/*
 *.sh
 pytorch_models/*
 out_files/*
-results/*
+results*
