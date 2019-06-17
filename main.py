@@ -8,7 +8,7 @@ import utils
 import DDPG
 import BCQ
 import TD3
-import BCQ
+import REM
 
 
 # Runs policy for X episodes and returns average reward
