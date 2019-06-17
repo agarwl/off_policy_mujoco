@@ -31,7 +31,7 @@ class ReplayBuffer(object):
 			np.array(done).reshape(-1, 1))
 
 	def save(self, filename):
-		np.save("./buffers/"+filename+".npy", self.storage)
+		np.save("./buffers/"+filename+".npy", self.storage, allow_pickle=True)
 
 	def load(self, filename):
-		self.storage = np.load("./buffers/"+filename+".npy")
+		self.storage = np.load("./buffers/"+filename+".npy", allow_pickle=True)

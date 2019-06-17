@@ -36,9 +36,10 @@ if __name__ == "__main__":
 	parser.add_argument("--buffer_type", default="Robust")				# Prepends name to filename.
 	parser.add_argument("--eval_freq", default=5e3, type=float)			# How often (time steps) we evaluate
 	parser.add_argument("--max_timesteps", default=1e6, type=float)		# Max time steps to run environment for
+	parser.add_argument("--agent_name", default="BCQ")
 	args = parser.parse_args()
 
-	file_name = "BCQ_%s_%s" % (args.env_name, str(args.seed))
+	file_name = "%s_%s_%s" % (args.agent_name, args.env_name, str(args.seed))
 	buffer_name = "%s_%s_%s" % (args.buffer_type, args.env_name, str(args.seed))
 	print "---------------------------------------"
 	print "Settings: " + file_name

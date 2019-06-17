@@ -20,6 +20,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	file_name = "DDPG_%s_%s" % (args.env_name, str(args.seed))
+	buffer_name = "Final_%s_%s" % (args.env_name, str(args.seed))
 	print "---------------------------------------"
 	print "Settings: " + file_name
 	print "---------------------------------------"
@@ -88,3 +89,4 @@ if __name__ == "__main__":
 		
 	# Save final policy
 	policy.save("%s" % (file_name), directory="./pytorch_models")
+	replay_buffer.save(buffer_name)
