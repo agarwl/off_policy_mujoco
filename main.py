@@ -39,9 +39,10 @@ if __name__ == "__main__":
 	parser.add_argument("--eval_freq", default=5e3, type=float)			# How often (time steps) we evaluate
 	parser.add_argument("--max_timesteps", default=1e6, type=float)		# Max time steps to run environment for
 	parser.add_argument("--agent_name", default="BCQ")
+	parser.add_argument("--lr", default=1e-3, type=float)
 	args = parser.parse_args()
 
-	file_name = "%s_%s_%s" % (args.agent_name, args.env_name, str(args.seed))
+	file_name = "%s_%s_%s_%s" % (args.agent_name, args.env_name, str(args.seed), str(args.lr))
 	buffer_name = "%s_%s_%s" % (args.buffer_type, args.env_name, str(args.seed))
 	print "---------------------------------------"
 	print "Settings: " + file_name
@@ -68,7 +69,7 @@ if __name__ == "__main__":
 	  policy_agent = TD3.TD3
 	elif args.agent_name == 'REM':
 	  policy_agent = REM.REM
-	policy = policy_agent(state_dim, action_dim, max_action)
+	policy = policy_agent(state_dim, action_dim, max_action, lr=args.lr)
 
 	# Load buffer
 	replay_buffer = utils.ReplayBuffer()
