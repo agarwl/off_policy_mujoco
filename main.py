@@ -31,7 +31,7 @@ def evaluate_policy(policy, eval_episodes=10):
 
 
 if __name__ == "__main__":
-	
+
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--env_name", default="Hopper-v1")				# OpenAI gym environment name
 	parser.add_argument("--seed", default=0, type=int)					# Sets Gym, PyTorch and Numpy seeds
@@ -57,9 +57,9 @@ if __name__ == "__main__":
 	env.seed(args.seed)
 	torch.manual_seed(args.seed)
 	np.random.seed(args.seed)
-	
+
 	state_dim = env.observation_space.shape[0]
-	action_dim = env.action_space.shape[0] 
+	action_dim = env.action_space.shape[0]
 	max_action = float(env.action_space.high[0])
 
 	# Initialize policy
@@ -74,14 +74,14 @@ if __name__ == "__main__":
 	# Load buffer
 	replay_buffer = utils.ReplayBuffer()
 	replay_buffer.load(buffer_name)
-	
+
 	evaluations = []
 
 	episode_num = 0
-	done = True 
+	done = True
 
 	training_iters = 0
-	while training_iters < args.max_timesteps: 
+	while training_iters < args.max_timesteps:
 		pol_vals = policy.train(replay_buffer, iterations=int(args.eval_freq))
 
 		evaluations.append(evaluate_policy(policy))

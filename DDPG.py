@@ -21,14 +21,14 @@ class Actor(nn.Module):
 		self.l1 = nn.Linear(state_dim, 400)
 		self.l2 = nn.Linear(400, 300)
 		self.l3 = nn.Linear(300, action_dim)
-		
+
 		self.max_action = max_action
 
-	
+
 	def forward(self, state):
 		a = F.relu(self.l1(state))
 		a = F.relu(self.l2(a))
-		a = self.max_action * torch.tanh(self.l3(a)) 
+		a = self.max_action * torch.tanh(self.l3(a))
 		return a
 
 
@@ -69,11 +69,11 @@ class DDPG(object):
 		return self.actor(state).cpu().data.numpy().flatten()
 
 
-	def train(self, replay_buffer, iterations=500, batch_size=100, discount=0.99, tau=0.005): 
+	def train(self, replay_buffer, iterations=500, batch_size=100, discount=0.99, tau=0.005):
 
 		for it in range(iterations):
 
-			# Each of these are batches 
+			# Each of these are batches
 			state, next_state, action, reward, done = replay_buffer.sample(batch_size)
 			state 		= torch.FloatTensor(state).to(device)
 			action 		= torch.FloatTensor(action).to(device)
@@ -98,8 +98,8 @@ class DDPG(object):
 
 			# Compute actor loss
 			actor_loss = -self.critic(state, self.actor(state)).mean()
-			
-			# Optimize the actor 
+
+			# Optimize the actor
 			self.actor_optimizer.zero_grad()
 			actor_loss.backward()
 			self.actor_optimizer.step()

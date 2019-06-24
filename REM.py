@@ -18,14 +18,14 @@ class Actor(nn.Module):
 		self.l1 = nn.Linear(state_dim, 400)
 		self.l2 = nn.Linear(400, 300)
 		self.l3 = nn.Linear(300, action_dim)
-		
+
 		self.max_action = max_action
 
 
 	def forward(self, x):
 		x = F.relu(self.l1(x))
 		x = F.relu(self.l2(x))
-		x = self.max_action * torch.tanh(self.l3(x)) 
+		x = self.max_action * torch.tanh(self.l3(x))
 		return x
 
 
@@ -63,7 +63,7 @@ class Critic(nn.Module):
 		x1 = F.relu(self.l1(xu))
 		x1 = F.relu(self.l2(x1))
 		x1 = self.l3(x1)
-		return x1 
+		return x1
 
 
 class REM(object):
@@ -90,7 +90,7 @@ class REM(object):
 
 		for it in range(iterations):
 
-			# Sample replay buffer 
+			# Sample replay buffer
 			x, y, u, r, d = replay_buffer.sample(batch_size)
 			state = torch.FloatTensor(x).to(device)
 			action = torch.FloatTensor(u).to(device)
@@ -98,7 +98,7 @@ class REM(object):
 			done = torch.FloatTensor(1 - d).to(device)
 			reward = torch.FloatTensor(r).to(device)
 
-			# Select action according to policy and add clipped noise 
+			# Select action according to policy and add clipped noise
 			noise = torch.FloatTensor(u).data.normal_(0, policy_noise).to(device)
 			noise = noise.clamp(-noise_clip, noise_clip)
 			next_action = (self.actor_target(next_state) + noise).clamp(-self.max_action, self.max_action)
@@ -115,7 +115,7 @@ class REM(object):
 			current_Q = alpha[0] * current_Q1 + alpha[1] * current_Q2
 
 			# Compute critic loss
-			critic_loss = F.mse_loss(current_Q, target_Q) 
+			critic_loss = F.mse_loss(current_Q, target_Q)
 
 			# Optimize the critic
 			self.critic_optimizer.zero_grad()
@@ -128,8 +128,8 @@ class REM(object):
 				# Compute actor loss
 				Q1, Q2 = self.critic(state, self.actor(state))
 				actor_loss = -0.5 * (Q1 + Q2).mean()
-				
-				# Optimize the actor 
+
+				# Optimize the actor
 				self.actor_optimizer.zero_grad()
 				actor_loss.backward()
 				self.actor_optimizer.step()

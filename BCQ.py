@@ -14,7 +14,7 @@ class Actor(nn.Module):
 		self.l1 = nn.Linear(state_dim + action_dim, 400)
 		self.l2 = nn.Linear(400, 300)
 		self.l3 = nn.Linear(300, action_dim)
-		
+
 		self.max_action = max_action
 
 
@@ -55,7 +55,7 @@ class Critic(nn.Module):
 		return q1
 
 
-# Vanilla Variational Auto-Encoder 
+# Vanilla Variational Auto-Encoder
 class VAE(nn.Module):
 	def __init__(self, state_dim, action_dim, latent_dim, max_action):
 		super(VAE, self).__init__()
@@ -78,11 +78,11 @@ class VAE(nn.Module):
 		z = F.relu(self.e2(z))
 
 		mean = self.mean(z)
-		# Clamped for numerical stability 
+		# Clamped for numerical stability
 		log_std = self.log_std(z).clamp(-4, 15)
 		std = torch.exp(log_std)
-		z = mean + std * torch.FloatTensor(np.random.normal(0, 1, size=(std.size()))).to(device) 
-		
+		z = mean + std * torch.FloatTensor(np.random.normal(0, 1, size=(std.size()))).to(device)
+
 		u = self.decode(state, z)
 
 		return u, mean, std
@@ -96,7 +96,7 @@ class VAE(nn.Module):
 		a = F.relu(self.d1(torch.cat([state, z], 1)))
 		a = F.relu(self.d2(a))
 		return self.max_action * torch.tanh(self.d3(a))
-		
+
 
 
 class BCQ(object):
@@ -115,13 +115,13 @@ class BCQ(object):
 		self.critic_optimizer = torch.optim.Adam(self.critic.parameters())
 
 		self.vae = VAE(state_dim, action_dim, latent_dim, max_action).to(device)
-		self.vae_optimizer = torch.optim.Adam(self.vae.parameters()) 
+		self.vae_optimizer = torch.optim.Adam(self.vae.parameters())
 
 		self.max_action = max_action
 		self.action_dim = action_dim
 
 
-	def select_action(self, state):		
+	def select_action(self, state):
 		with torch.no_grad():
 			state = torch.FloatTensor(state.reshape(1, -1)).repeat(10, 1).to(device)
 			action = self.actor(state, self.vae.decode(state))
@@ -159,11 +159,11 @@ class BCQ(object):
 
 				# Duplicate state 10 times
 				state_rep = torch.FloatTensor(np.repeat(next_state_np, 10, axis=0)).to(device)
-				
+
 				# Compute value of perturbed actions sampled from the VAE
 				target_Q1, target_Q2 = self.critic_target(state_rep, self.actor_target(state_rep, self.vae.decode(state_rep)))
 
-				# Soft Clipped Double Q-learning 
+				# Soft Clipped Double Q-learning
 				target_Q = 0.75 * torch.min(target_Q1, target_Q2) + 0.25 * torch.max(target_Q1, target_Q2)
 				target_Q = target_Q.view(batch_size, -1).max(1)[0].view(-1, 1)
 
@@ -183,13 +183,13 @@ class BCQ(object):
 
 			# Update through DPG
 			actor_loss = -self.critic.q1(state, perturbed_actions).mean()
-		 	 
+
 			self.actor_optimizer.zero_grad()
 			actor_loss.backward()
 			self.actor_optimizer.step()
 
 
-			# Update Target Networks 
+			# Update Target Networks
 			for param, target_param in zip(self.critic.parameters(), self.critic_target.parameters()):
 				target_param.data.copy_(tau * param.data + (1 - tau) * target_param.data)
 
