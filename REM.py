@@ -101,14 +101,14 @@ class REM(object):
 			# Compute the target Q value
 			num_heads = self.critic.num_heads
 			target_Q_heads = self.critic_target(next_state, next_action)
-			alpha = torch.rand(num_heads)
-			alpha /= alpha.sum()
-			target_Q = torch.mv(target_Q_heads, alpha)
+			alpha = torch.rand((num_heads, 1))
+			alpha /= alpha.sum(dim=0)
+			target_Q = torch.matmul(target_Q_heads, alpha)
 			target_Q = reward + (done * discount * target_Q).detach()
 
 			# Get current Q estimates
 			current_Q_heads = self.critic(state, action)
-			current_Q = torch.mv(target_Q_heads, alpha)
+			current_Q = torch.matmul(target_Q_heads, alpha)
 
 			# Compute critic loss
 			critic_loss = F.mse_loss(current_Q, target_Q)
