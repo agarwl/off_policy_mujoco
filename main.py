@@ -9,6 +9,7 @@ import DDPG
 import BCQ
 import TD3
 import REM
+import RSEM
 
 
 # Runs policy for X episodes and returns average reward
@@ -41,11 +42,14 @@ if __name__ == "__main__":
 	parser.add_argument("--agent_name", default="BCQ")
 	parser.add_argument("--lr", default=1e-3, type=float)
 	parser.add_argument("--num_heads", default=100, type=int)
+	parser.add_argument("--prefix", default="")
 	args = parser.parse_args()
 
 	file_name = "%s_%s_%s_%s" % (args.agent_name, args.env_name, str(args.seed), str(args.lr))
 	if args.agent_name == 'REM':
 	  file_name += '_%s' % (args.num_heads)
+        if args.prefix:
+	  file_name += '_%s' % (args.prefix)
 	buffer_name = "%s_%s_%s" % (args.buffer_type, args.env_name, str(args.seed))
 	print "---------------------------------------"
 	print "Settings: " + file_name
@@ -74,6 +78,8 @@ if __name__ == "__main__":
 	elif args.agent_name == 'REM':
 	  policy_agent = REM.REM
 	  kwargs.update(num_heads=args.num_heads)
+        elif args.agent_name == 'RSEM':
+	  policy_agent = RSEM.RSEM
 	policy = policy_agent(state_dim, action_dim, max_action, lr=args.lr, **kwargs)
 
 	# Load buffer
