@@ -62,16 +62,16 @@ class Critic(nn.Module):
 
 class REM(object):
 	"""Random Ensemble Mixture."""
-	def __init__(self, state_dim, action_dim, max_action):
+	def __init__(self, state_dim, action_dim, max_action, lr=1e-3, num_heads=2):
 		self.actor = Actor(state_dim, action_dim, max_action).to(device)
 		self.actor_target = Actor(state_dim, action_dim, max_action).to(device)
 		self.actor_target.load_state_dict(self.actor.state_dict())
-		self.actor_optimizer = torch.optim.Adam(self.actor.parameters())
+		self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=lr)
 
-		self.critic = Critic(state_dim, action_dim).to(device)
-		self.critic_target = Critic(state_dim, action_dim).to(device)
+		self.critic = Critic(state_dim, action_dim, num_heads).to(device)
+		self.critic_target = Critic(state_dim, action_dim, num_heads).to(device)
 		self.critic_target.load_state_dict(self.critic.state_dict())
-		self.critic_optimizer = torch.optim.Adam(self.critic.parameters())
+		self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=lr)
 
 		self.max_action = max_action
 
@@ -103,6 +103,7 @@ class REM(object):
 			target_Q_heads = self.critic_target(next_state, next_action)
 			alpha = torch.rand((num_heads, 1))
 			alpha /= alpha.sum(dim=0)
+			alpha = alpha.to(device)
 			target_Q = torch.matmul(target_Q_heads, alpha)
 			target_Q = reward + (done * discount * target_Q).detach()
 
