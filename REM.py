@@ -109,7 +109,7 @@ class REM(object):
 
 			# Get current Q estimates
 			current_Q_heads = self.critic(state, action)
-			current_Q = torch.matmul(target_Q_heads, alpha)
+			current_Q = torch.matmul(current_Q_heads, alpha)
 
 			# Compute critic loss
 			critic_loss = F.mse_loss(current_Q, target_Q)
