@@ -44,6 +44,8 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	file_name = "%s_%s_%s_%s" % (args.agent_name, args.env_name, str(args.seed), str(args.lr))
+	if args.agent_name == 'REM':
+	  file_name += '_%s' % (args.num_heads)
 	buffer_name = "%s_%s_%s" % (args.buffer_type, args.env_name, str(args.seed))
 	print "---------------------------------------"
 	print "Settings: " + file_name
