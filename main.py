@@ -40,6 +40,7 @@ if __name__ == "__main__":
 	parser.add_argument("--max_timesteps", default=1e6, type=float)		# Max time steps to run environment for
 	parser.add_argument("--agent_name", default="BCQ")
 	parser.add_argument("--lr", default=1e-3, type=float)
+	parser.add_argument("--num_heads", default=100, type=int)
 	args = parser.parse_args()
 
 	file_name = "%s_%s_%s_%s" % (args.agent_name, args.env_name, str(args.seed), str(args.lr))
@@ -63,13 +64,15 @@ if __name__ == "__main__":
 	max_action = float(env.action_space.high[0])
 
 	# Initialize policy
+	kwargs = {}
 	if args.agent_name == 'BCQ':
 	  policy_agent = BCQ.BCQ
 	elif args.agent_name == 'TD3':
 	  policy_agent = TD3.TD3
 	elif args.agent_name == 'REM':
 	  policy_agent = REM.REM
-	policy = policy_agent(state_dim, action_dim, max_action, lr=args.lr)
+	  kwargs.update(num_heads=args.num_heads)
+	policy = policy_agent(state_dim, action_dim, max_action, lr=args.lr, **kwargs)
 
 	# Load buffer
 	replay_buffer = utils.ReplayBuffer()

@@ -49,8 +49,7 @@ class Critic(nn.Module):
 
 		x1 = F.relu(self.l1(xu))
 		x1 = F.relu(self.l2(x1))
-		x_all = self.l3(x1)
-		return torch.split(x_all, self.num_heads)
+		return self.l3(x1)
 
 	def Q_value(self, x, u):
 		xu = torch.cat([x, u], 1)
