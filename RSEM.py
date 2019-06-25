@@ -21,6 +21,7 @@ class Actor(nn.Module):
 
 		self.max_action = max_action
 
+
 	def forward(self, x):
 		x = F.relu(self.l1(x))
 		x = F.relu(self.l2(x))
@@ -29,19 +30,18 @@ class Actor(nn.Module):
 
 
 class Critic(nn.Module):
-	def __init__(self, state_dim, action_dim, num_heads):
+	def __init__(self, state_dim, action_dim):
 		super(Critic, self).__init__()
-		self.num_heads = num_heads
 
 		# Q1 architecture
 		self.l1 = nn.Linear(state_dim + action_dim, 400)
 		self.l2 = nn.Linear(400, 300)
-		self.l3 = nn.Linear(300, num_heads)
+		self.l3 = nn.Linear(300, 1)
 
-		# # Q2 architecture
-		# self.l4 = nn.Linear(state_dim + action_dim, 400)
-		# self.l5 = nn.Linear(400, 300)
-		# self.l6 = nn.Linear(300, 1)
+		# Q2 architecture
+		self.l4 = nn.Linear(state_dim + action_dim, 400)
+		self.l5 = nn.Linear(400, 300)
+		self.l6 = nn.Linear(300, 1)
 
 
 	def forward(self, x, u):
@@ -49,20 +49,25 @@ class Critic(nn.Module):
 
 		x1 = F.relu(self.l1(xu))
 		x1 = F.relu(self.l2(x1))
-		x_all = self.l3(x1)
-		return torch.split(x_all, self.num_heads)
+		x1 = self.l3(x1)
 
-	def Q_value(self, x, u):
+		x2 = F.relu(self.l4(xu))
+		x2 = F.relu(self.l5(x2))
+		x2 = self.l6(x2)
+		return x1, x2
+
+
+	def Q1(self, x, u):
 		xu = torch.cat([x, u], 1)
 
 		x1 = F.relu(self.l1(xu))
 		x1 = F.relu(self.l2(x1))
 		x1 = self.l3(x1)
-		return x1.mean(dim=-1, keepdim=True)
+		return x1
 
 
-class REM(object):
-	"""Random Ensemble Mixture."""
+class RSEM(object):
+	"""Random Separate Ensemble Mixture"""
 	def __init__(self, state_dim, action_dim, max_action):
 		self.actor = Actor(state_dim, action_dim, max_action).to(device)
 		self.actor_target = Actor(state_dim, action_dim, max_action).to(device)
@@ -100,16 +105,15 @@ class REM(object):
 			next_action = (self.actor_target(next_state) + noise).clamp(-self.max_action, self.max_action)
 
 			# Compute the target Q value
-			num_heads = self.critic.num_heads
-			target_Q_heads = self.critic_target(next_state, next_action)
-			alpha = torch.rand(num_heads)
+			target_Q1, target_Q2 = self.critic_target(next_state, next_action)
+			alpha = torch.rand(2)
 			alpha /= alpha.sum()
-			target_Q = torch.mv(target_Q_heads, alpha)
+			target_Q = alpha[0] * target_Q1 + alpha[1] * target_Q2
 			target_Q = reward + (done * discount * target_Q).detach()
 
 			# Get current Q estimates
-			current_Q_heads = self.critic(state, action)
-			current_Q = torch.mv(target_Q_heads, alpha)
+			current_Q1, current_Q2 = self.critic(state, action)
+			current_Q = alpha[0] * current_Q1 + alpha[1] * current_Q2
 
 			# Compute critic loss
 			critic_loss = F.mse_loss(current_Q, target_Q)
@@ -123,7 +127,8 @@ class REM(object):
 			if it % policy_freq == 0:
 
 				# Compute actor loss
-				actor_loss = -(self.critic.Q_value(state, self.actor(state)).mean())
+				Q1, Q2 = self.critic(state, self.actor(state))
+				actor_loss = -0.5 * (Q1 + Q2).mean()
 
 				# Optimize the actor
 				self.actor_optimizer.zero_grad()
