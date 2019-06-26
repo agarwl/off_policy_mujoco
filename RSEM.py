@@ -73,6 +73,7 @@ class Critic(nn.Module):
 
 class RSEM(object):
 	def __init__(self, state_dim, action_dim, max_action, lr=1e-3, num_heads=100):
+		"""Random Separate Ensemble Mixture."""
 		self.actor = Actor(state_dim, action_dim, max_action).to(device)
 		self.actor_target = Actor(state_dim, action_dim, max_action).to(device)
 		self.actor_target.load_state_dict(self.actor.state_dict())

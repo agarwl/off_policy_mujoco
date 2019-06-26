@@ -42,11 +42,14 @@ if __name__ == "__main__":
 	parser.add_argument("--agent_name", default="BCQ")
 	parser.add_argument("--lr", default=1e-3, type=float)
 	parser.add_argument("--num_heads", default=100, type=int)
+	parser.add_argument("--prefix", default="")
 	args = parser.parse_args()
 
 	file_name = "%s_%s_%s_%s" % (args.agent_name, args.env_name, str(args.seed), str(args.lr))
 	if args.agent_name == 'REM':
 	  file_name += '_%s' % (args.num_heads)
+        if args.prefix:
+	  file_name += '_%s' % (args.prefix)
 	buffer_name = "%s_%s_%s" % (args.buffer_type, args.env_name, str(args.seed))
 	print "---------------------------------------"
 	print "Settings: " + file_name
