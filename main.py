@@ -10,6 +10,7 @@ import BCQ
 import TD3
 import REM
 import RSEM
+import DDPG_REM
 
 
 # Runs policy for X episodes and returns average reward
@@ -71,7 +72,7 @@ if __name__ == "__main__":
 
 	# Initialize policy
 	kwargs = {'lr': args.lr}
-	if args.agent_name == 'REM' or args.agent_name == 'RSEM':
+	if args.agent_name in ['REM', 'RSEM', 'DDPG_REM']:
 	  kwargs.update(num_heads=args.num_heads)
 	if args.agent_name == 'BCQ':
 	  policy_agent = BCQ.BCQ
@@ -81,6 +82,8 @@ if __name__ == "__main__":
 	  policy_agent = REM.REM
 	elif args.agent_name == 'RSEM':
 	  policy_agent = RSEM.RSEM
+	elif args.agent_name == 'DDPG_REM':
+	  policy_agent = DDPG_REM.DDPG_REM
 	policy = policy_agent(state_dim, action_dim, max_action, **kwargs)
 
 	# Load buffer
