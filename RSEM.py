@@ -108,6 +108,7 @@ class RSEM(object):
 			noise = noise.clamp(-noise_clip, noise_clip)
 			next_action = (self.actor_target(next_state) + noise).clamp(-self.max_action, self.max_action)
 
+			num_heads = self.critic.num_heads
 			# Compute the target Q value
 			target_Q1, target_Q2 = self.critic_target(next_state, next_action)
 			alpha1, alpha2 = simplex_sample(num_heads), simplex_sample(num_heads)
