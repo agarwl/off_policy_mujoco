@@ -70,7 +70,7 @@ if __name__ == "__main__":
 	max_action = float(env.action_space.high[0])
 
 	# Initialize policy
-	kwargs = {lr: args.lr}
+	kwargs = {'lr': args.lr}
 	if args.agent_name == 'REM' or args.agent_name == 'RSEM':
 	  kwargs.update(num_heads=args.num_heads)
 	if args.agent_name == 'BCQ':
