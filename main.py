@@ -84,6 +84,9 @@ if __name__ == "__main__":
 	  policy_agent = RSEM.RSEM
 	elif args.agent_name == 'DDPG_REM':
 	  policy_agent = DDPG_REM.DDPG_REM
+	elif args.agent_name == 'DDPG':
+	 policy_agent = DDPG.DDPG
+	 kwargs.pop('lr')
 	policy = policy_agent(state_dim, action_dim, max_action, **kwargs)
 
 	# Load buffer
