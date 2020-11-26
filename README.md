@@ -1,7 +1,7 @@
 # Off-Policy Deep Reinforcement Learning without Exploration (REM + TD3)
 
 ```diff
-- Note this is a preliminary repository and **no effort** was spent getting REM to work well with TD3 and (as it doesn't work).
+- Note this is a preliminary repository and *no effort* was spent getting REM to work well with TD3 and (as it doesn't work).
 - This repository should should not be used for benchmarking and only be used a starting point for MuJoCo experiments.
 ```
 
