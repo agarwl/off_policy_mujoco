@@ -1,4 +1,4 @@
-# Off-Policy Deep Reinforcement Learning without Exploration (REM + TD3)
+# REM + TD3 (Doesn't work)
 
 ```diff
 - Note this is a preliminary repository and *no effort* was spent getting REM to work well with TD3 and (as it doesn't work).
